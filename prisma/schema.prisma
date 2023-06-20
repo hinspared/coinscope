@@ -1,0 +1,75 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  email          String?   @unique
+  name           String?
+  emailVerified  DateTime?
+  hashedPassword String?
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  coins          String[]
+  Account        Account[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Coin {
+  id                               String    @id @map("_id")
+  symbol                           String
+  name                             String
+  image                            String
+  current_price                    Float
+  market_cap                       Float
+  market_cap_rank                  Int
+  fully_diluted_valuation          Float?
+  total_volume                     Float
+  high_24h                         Float
+  low_24h                          Float
+  price_change_24h                 Float
+  price_change_percentage_24h      Float
+  market_cap_change_24h            Float
+  market_cap_change_percentage_24h Float
+  circulating_supply               Float?
+  total_supply                     Float?
+  max_supply                       Float?
+  ath                              Float?
+  ath_change_percentage            Float?
+  ath_date                         DateTime?
+  atl                              Float?
+  atl_change_percentage            Float?
+  atl_date                         DateTime?
+  roi                              Json?
+  last_updated                     DateTime
+}
+
+model Currency {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  code String @unique
+  rate Float
+}
